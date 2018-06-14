@@ -95,6 +95,12 @@ view: order_items {
     drill_fields: [detail*]
   }
 
+  dimension: profit {
+    type: number
+    sql: ${sale_price} - ${inventory_items.cost} ;;
+  }
+
+
   # ----- Sets of fields for drilling ------
   set: detail {
     fields: [

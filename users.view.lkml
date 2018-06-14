@@ -8,8 +8,23 @@ view: users {
   }
 
   dimension: age {
+    group_label: "Age"
     type: number
     sql: ${TABLE}.age ;;
+  }
+
+  dimension: age_tier {
+    group_label: "Age"
+    type: tier
+    tiers: [10,20,30,50,90]
+    sql: ${age} ;;
+    style: integer
+  }
+
+  dimension: is_below_45 {
+    group_label: "Age"
+    type: yesno
+    sql: ${age} < 45 ;;
   }
 
   dimension: city {
@@ -34,6 +49,24 @@ view: users {
       quarter,
       year
     ]
+    sql: ${TABLE}.created_at ;;
+  }
+
+  dimension: is_new_user {
+    type: yesno
+    sql: DATEDIFF(day,${created_date},CURRENT_DATE) < 7 ;;
+  }
+
+  measure: count_new_users {
+    type: count
+    filters: {
+      field: is_new_user
+      value: "yes"
+    }
+  }
+
+  dimension: created_at_month {
+    type: date_month
     sql: ${TABLE}.created_at ;;
   }
 
@@ -84,6 +117,23 @@ view: users {
 
   measure: count {
     type: count
-    drill_fields: [id, first_name, last_name, events.count, order_items.count]
+    drill_fields: [detail*]
+  }
+
+  measure: count_unique_ages {
+    type: count_distinct
+    sql: ${age} ;;
+  }
+
+  measure: count_users_under_45 {
+    type: count
+    filters: {
+      field: is_below_45
+      value: "yes"
+    }
+  }
+
+  set: detail {
+    fields: [id,state,city,country,created_date]
   }
 }
